@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Clicker</title>
+    <title>Walter White Clicker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and general aesthetics */
+        body {
+            font-family: "Inter", sans-serif;
+        }
+        /* Basic button styling for hover effects */
+        button {
+            transition: all 0.3s ease-in-out;
+        }
+        button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        /* Styles for the modal overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000; /* Ensure it's on top of everything */
+        }
+        /* Styles for the modal content */
+        .modal-content {
+            background-color: #fff;
+            padding: 2.5rem; /* p-10 equivalent */
+            border-radius: 1rem; /* rounded-2xl equivalent */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl equivalent */
+            max-width: 28rem; /* max-w-md equivalent */
+            width: 90%; /* Responsive width */
+            text-align: center;
+        }
+    </style>
+</head>
+    <body class="bg-gradient-to-br from-gray-950 to-gray-900 min-h-screen flex items-center justify-center p-4">
+    <!-- Background Music -->
+    <audio id="bgMusic" src="assets/bg-Music.ogg" loop autoplay></audio>
+    <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center gap-2 bg-gray-900 bg-opacity-80 px-4 py-2 rounded-lg shadow-lg border border-gray-800">
+        <label for="bgMusicSlider" class="text-blue-100 text-sm font-semibold">Music Volume</label>
+        <input type="range" id="bgMusicSlider" min="0" max="100" value="45" class="w-32 h-2 accent-blue-400" />
+    </div>
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-2xl w-full max-w-3xl border border-gray-800 flex flex-col gap-4">
+        <div class="flex flex-row gap-6 items-center justify-between">
+            <div class="flex flex-col items-center gap-2">
+                <p class="text-md text-gray-500">Credits: Walter White</p>
+                <h1 class="text-3xl font-extrabold text-blue-200 tracking-tight">🧪 Walter White Clicker 🧪</h1>
+            </div>
+            <img src="https://static1.srcdn.com/wordpress/wp-content/uploads/2020/02/Breaking-Bad-things-Walter-White-feature.jpg?q=70&fit=contain&w=1200&h=628&dpr=1" alt="Walter White" class="rounded-full shadow-lg w-24 h-24 object-cover border-4 border-blue-900" />
+        </div>
+        <div class="flex flex-row gap-6 items-stretch">
+            <div class="flex flex-col justify-center items-center bg-gray-950 p-4 rounded-xl shadow-inner border border-gray-800 w-1/2">
+                <p class="text-xl text-blue-200 mb-2">Current Meth:</p>
+                <p id="cookieCount" class="text-5xl font-black text-blue-400 mb-4 drop-shadow-md">0</p>
+                <button id="cookieButton" class="bg-blue-900 hover:bg-blue-800 text-blue-100 font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-900 mb-2">
+                    Click for Meth!
+                </button>
+                <div class="flex flex-col gap-1 mt-2">
+                    <p class="text-lg text-blue-200">
+                        MPC: <span id="cpcDisplay" class="font-bold text-indigo-300">1</span>
+                    </p>
+                    <p class="text-lg text-blue-200">
+                        MPS: <span id="cpsDisplay" class="font-bold text-indigo-300">0</span>
+                    </p>
+                    <p class="text-lg text-blue-200">
+                        Criminal Charges: <span id="rebirthsDisplay" class="font-bold text-indigo-300">0</span>
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col justify-center items-center gap-4 w-1/2">
+                <button id="rebirthButton" class="bg-purple-700 hover:bg-purple-800 text-purple-100 font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-purple-700">
+                    Commit Crime! (Cost: <span id="rebirthCostDisplay">30000</span> Meth)
+                </button>
+                <button id="toggleUpgradesButton" class="bg-gray-900 hover:bg-gray-800 text-blue-100 font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-900">
+                    Toggle Upgrades
+                </button>
+                <audio id="walterAudio"></audio>
+            </div>
+        </div>
+        <div id="upgradesSection" class="bg-gray-950 p-4 rounded-xl shadow-inner border border-gray-800 mt-2">
+            <h2 class="text-2xl font-bold text-blue-200 mb-4 text-center">💊 Upgrades 💊</h2>
+            <div id="upgradesContainer" class="space-y-3">
+                <!-- Upgrades will be dynamically added here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Offline Collection Modal (initially hidden) -->
+    <div id="offlineModal" class="modal-overlay hidden">
+        <div class="modal-content bg-gray-950 border border-gray-800">
+            <h3 class="text-3xl font-bold text-blue-200 mb-6">Welcome Back!</h3>
+            <p class="text-xl text-blue-200 mb-6">
+                While you were away, your lab produced:
+                <br><span id="offlineCookiesAmount" class="text-4xl font-black text-yellow-300">0</span> Meth!
+            </p>
+            <div class="flex flex-col space-y-4">
+                <button id="collectOfflineButton" class="bg-green-900 hover:bg-green-800 text-green-100 font-bold py-4 px-8 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-900">
+                    Collect
+                </button>
+                <button id="dontCollectOfflineButton" class="bg-gray-900 hover:bg-gray-800 text-blue-100 font-bold py-4 px-8 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-900">
+                    Don't Collect
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Background music setup
+        const bgMusic = document.getElementById('bgMusic');
+        const bgMusicSlider = document.getElementById('bgMusicSlider');
+        if (bgMusic) {
+            bgMusic.volume = 0.45;
+            bgMusicSlider.value = 45;
+            bgMusicSlider.addEventListener('input', function() {
+                bgMusic.volume = bgMusicSlider.value / 100;
+            });
+            // Start music on first user interaction
+            let musicStarted = false;
+            function startMusic() {
+                if (!musicStarted) {
+                    bgMusic.play();
+                    musicStarted = true;
+                }
+            }
+            window.addEventListener('click', startMusic, { once: true });
+        }
+        // Game state variables
+        let meth = 0; // meth
+        let mpc = 1;  // meth per click
+        let mps = 0;  // meth per second
+        let criminalCharges = 0;
+        let currentChargeCost = 30000;
+
+        // Console helper functions for Chrome DevTools
+        // Use setMeth(amount) to set your meth count
+        // Use setMPC(amount) to set your meth per click
+        window.setMeth = function(amount) {
+            meth = Number(amount);
+            updateDisplay();
+            saveGame();
+            return `Meth set to ${meth}`;
+        };
+        window.setMPC = function(amount) {
+            mpc = Number(amount);
+            updateDisplay();
+            saveGame();
+            return `Meth Per Click set to ${mpc}`;
+        };
+
+        // Define available upgrades
+        // Each upgrade now has an 'initialCost', 'permanent' flag, and 'requiredRebirths'
+        const upgrades = [
+            { id: 'upgrade1', name: 'Better Chemistry', initialCost: 10, cost: 10, cpc_boost: 1, type: 'cpc', permanent: false, requiredRebirths: 0 },
+            { id: 'upgrade2', name: 'Blue Crystal Flask', initialCost: 50, cost: 50, cpc_boost: 5, type: 'cpc', permanent: false, requiredRebirths: 0 },
+            { id: 'upgrade3', name: 'Lab Assistant', initialCost: 100, cost: 100, cps_boost: 1, type: 'cps', permanent: false, requiredRebirths: 0 },
+            { id: 'upgrade4', name: 'RV Lab', initialCost: 200, cost: 200, cpc_boost: 20, type: 'cpc', permanent: false, requiredRebirths: 0 },
+            { id: 'upgrade5', name: 'Jesse Pinkman', initialCost: 500, cost: 500, cps_boost: 5, type: 'cps', permanent: false, requiredRebirths: 0 },
+            { id: 'upgrade6', name: 'Superlab', initialCost: 1000, cost: 1000, cps_boost: 25, type: 'cps', permanent: false, requiredRebirths: 0 },
+            { id: 'upgrade7', name: 'Gus Fring', initialCost: 5000, cost: 5000, cps_boost: 50, type: 'cps', permanent: false, requiredRebirths: 0 },
+            // New permanent upgrades that require rebirths
+            { id: 'rebirthUpgrade1', name: 'Heisenberg Boost', initialCost: 10000, cost: 10000, cpc_boost: 100, type: 'cpc', permanent: true, requiredRebirths: 1 },
+            { id: 'rebirthUpgrade2', name: 'Blue Magic Auto', initialCost: 25000, cost: 25000, cps_boost: 50, type: 'cps', permanent: true, requiredRebirths: 2 },
+            { id: 'rebirthUpgrade3', name: 'Empire Expansion', initialCost: 100000, cost: 100000, cps_boost: 200, type: 'cps', permanent: true, requiredRebirths: 3 },
+            { id: 'rebirthUpgrade4', name: 'Ultimate Heisenberg', initialCost: 500000, cost: 500000, cpc_boost: 1000, type: 'cpc', permanent: true, requiredRebirths: 5 }
+        ];
+
+        // Get references to DOM elements
+        const methCountDisplay = document.getElementById('cookieCount');
+        const mpcDisplay = document.getElementById('cpcDisplay');
+        const mpsDisplay = document.getElementById('cpsDisplay');
+        const chargesDisplay = document.getElementById('rebirthsDisplay');
+        const methButton = document.getElementById('cookieButton');
+        const upgradesSection = document.getElementById('upgradesSection');
+        const upgradesContainer = document.getElementById('upgradesContainer');
+        const toggleUpgradesButton = document.getElementById('toggleUpgradesButton');
+        const chargeButton = document.getElementById('rebirthButton');
+        const chargeCostDisplay = document.getElementById('rebirthCostDisplay');
+
+        // Modal elements
+        const offlineModal = document.getElementById('offlineModal');
+        const offlineCookiesAmountDisplay = document.getElementById('offlineCookiesAmount');
+        const collectOfflineButton = document.getElementById('collectOfflineButton');
+        const dontCollectOfflineButton = document.getElementById('dontCollectOfflineButton');
+
+
+        /**
+         * Updates the display of cookies, CPC, CPS, rebirths, and enables/disables buttons.
+         */
+        function updateDisplay() {
+            // Update main stats
+            if (methCountDisplay) methCountDisplay.textContent = meth.toLocaleString();
+            if (mpcDisplay) mpcDisplay.textContent = mpc.toLocaleString();
+            if (mpsDisplay) mpsDisplay.textContent = mps.toLocaleString();
+            if (chargesDisplay) chargesDisplay.textContent = criminalCharges.toLocaleString();
+            if (chargeCostDisplay) chargeCostDisplay.textContent = currentChargeCost.toLocaleString();
+
+            // Enable/disable criminal charge button
+            if (chargeButton) {
+                chargeButton.disabled = meth < currentChargeCost;
+                chargeButton.classList.toggle('opacity-50', meth < currentChargeCost);
+                chargeButton.classList.toggle('cursor-not-allowed', meth < currentChargeCost);
+            }
+
+            // Iterate through each upgrade to update its button state and display
+            upgrades.forEach(upgrade => {
+                const button = document.getElementById(upgrade.id);
+                if (button) {
+                    button.disabled = meth < upgrade.cost;
+                    button.classList.toggle('opacity-50', meth < upgrade.cost);
+                    button.classList.toggle('cursor-not-allowed', meth < upgrade.cost);
+
+                    let boostText = '';
+                    if (upgrade.type === 'cpc') {
+                        boostText = `+${upgrade.cpc_boost} MPC`;
+                    } else if (upgrade.type === 'cps') {
+                        boostText = `+${upgrade.cps_boost} MPS`;
+                    }
+                    button.innerHTML = `
+                        <span class="block text-xl">${upgrade.name}</span>
+                        <span class="block text-base opacity-90">Cost: ${upgrade.cost.toLocaleString()} Meth (${boostText})</span>
+                    `;
+                }
+            });
+        }
+
+        /**
+         * Handles the main cookie button click event.
+         * Increases cookies by the current CPC.
+         */
+        function clickMeth() {
+            meth += mpc;
+            updateDisplay();
+        }
+
+        /**
+         * Handles the purchase of an upgrade.
+         * @param {string} upgradeId - The ID of the upgrade to purchase.
+         */
+        function buyUpgrade(upgradeId) {
+            const upgrade = upgrades.find(u => u.id === upgradeId);
+
+            if (upgrade && meth >= upgrade.cost) {
+                meth -= upgrade.cost;
+
+                if (upgrade.type === 'cpc') {
+                    mpc += upgrade.cpc_boost;
+                } else if (upgrade.type === 'cps') {
+                    mps += upgrade.cps_boost;
+                }
+
+                upgrade.cost = Math.floor(upgrade.cost * 1.5);
+
+                updateDisplay();
+                saveGame();
+            } else {
+                console.log("Cannot buy upgrade: Not enough meth or upgrade not found.");
+            }
+        }
+
+        /**
+         * Initializes the upgrade buttons in the UI.
+         * This function is called once when the page loads and after a rebirth.
+         */
+        function initializeUpgrades() {
+            if (!upgradesContainer) {
+                console.error("Upgrades container not found. Cannot initialize upgrades.");
+                return;
+            }
+            upgradesContainer.innerHTML = '';
+
+            upgrades.forEach(upgrade => {
+                if (criminalCharges >= (upgrade.requiredRebirths || 0)) {
+                    const button = document.createElement('button');
+                    button.id = upgrade.id;
+                    button.className = 'w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 active:scale-95 disabled:bg-gray-400 disabled:hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-purple-300';
+
+                    let boostText = '';
+                    if (upgrade.type === 'cpc') {
+                        boostText = `+${upgrade.cpc_boost} MPC`;
+                    } else if (upgrade.type === 'cps') {
+                        boostText = `+${upgrade.cps_boost} MPS`;
+                    }
+
+                    button.innerHTML = `
+                        <span class="block text-xl">${upgrade.name}</span>
+                        <span class="block text-base opacity-90">Cost: ${upgrade.cost.toLocaleString()} Meth (${boostText})</span>
+                    `;
+                    button.onclick = () => buyUpgrade(upgrade.id);
+                    upgradesContainer.appendChild(button);
+                }
+            });
+        }
+
+        /**
+         * Toggles the visibility of the upgrades section.
+         */
+        function toggleUpgradesVisibility() {
+            if (upgradesSection) {
+                upgradesSection.classList.toggle('hidden');
+            } else {
+                console.error("Upgrades section not found. Cannot toggle visibility.");
+            }
+        }
+
+        /**
+         * Resets the game state to its initial values for a "rebirth".
+         */
+        function criminalCharge() {
+            if (meth >= currentChargeCost) {
+                meth -= currentChargeCost;
+                criminalCharges++;
+
+                currentChargeCost = Math.floor(currentChargeCost * 2);
+
+                meth = 0;
+                mpc = 1;
+                mps = 0;
+
+                upgrades.forEach(upgrade => {
+                    if (!upgrade.permanent) {
+                        upgrade.cost = upgrade.initialCost;
+                    }
+                });
+
+                initializeUpgrades();
+                updateDisplay();
+                saveGame();
+            } else {
+                console.log("Not enough meth for criminal charge!");
+            }
+        }
+
+        /**
+         * Game loop function to automatically add cookies based on CPS.
+         * This function runs every second.
+         */
+        function gameLoop() {
+            meth += mps;
+            updateDisplay();
+        }
+
+        /**
+         * Saves the current game state to localStorage.
+         */
+        function saveGame() {
+            const gameData = {
+                meth: meth,
+                mpc: mpc,
+                mps: mps,
+                criminalCharges: criminalCharges,
+                currentChargeCost: currentChargeCost,
+                upgrades: upgrades.map(u => ({ id: u.id, cost: u.cost })),
+                lastPlayedTime: Date.now()
+            };
+            try {
+                localStorage.setItem('walterWhiteClickerSave', JSON.stringify(gameData));
+                console.log("Game saved!");
+            } catch (e) {
+                console.error("Error saving game to localStorage:", e);
+            }
+        }
+
+        /**
+         * Loads the game state from localStorage and handles offline progression.
+         */
+        function loadGame() {
+            try {
+                const savedData = localStorage.getItem('walterWhiteClickerSave');
+                if (savedData) {
+                    const gameData = JSON.parse(savedData);
+
+                    meth = gameData.meth || 0;
+                    mpc = gameData.mpc || 1;
+                    mps = gameData.mps || 0;
+                    criminalCharges = gameData.criminalCharges || 0;
+                    currentChargeCost = gameData.currentChargeCost || 30000;
+
+                    if (gameData.upgrades) {
+                        gameData.upgrades.forEach(savedUpgrade => {
+                            const localUpgrade = upgrades.find(u => u.id === savedUpgrade.id);
+                            if (localUpgrade) {
+                                localUpgrade.cost = savedUpgrade.cost;
+                            }
+                        });
+                    }
+
+                    const lastPlayedTime = gameData.lastPlayedTime;
+                    if (lastPlayedTime && mps > 0) {
+                        const timeElapsedMs = Date.now() - lastPlayedTime;
+                        const timeElapsedSeconds = Math.floor(timeElapsedMs / 1000);
+                        const offlineMeth = mps * timeElapsedSeconds;
+
+                        if (offlineMeth > 0) {
+                            showOfflineCollectMenu(offlineMeth);
+                        }
+                    }
+                    console.log("Game loaded!");
+                } else {
+                    console.log("No saved game found. Starting new game.");
+                }
+            } catch (e) {
+                console.error("Error loading game from localStorage:", e);
+                localStorage.removeItem('walterWhiteClickerSave');
+                console.log("Corrupted save detected and cleared. Starting new game.");
+            }
+        }
+
+        /**
+         * Displays the offline cookie collection modal.
+         * @param {number} amount - The amount of cookies earned offline.
+         */
+        function showOfflineCollectMenu(amount) {
+            if (offlineModal && offlineCookiesAmountDisplay) {
+                offlineCookiesAmountDisplay.textContent = amount.toLocaleString();
+                offlineModal.classList.remove('hidden');
+
+                collectOfflineButton.onclick = () => {
+                    meth += amount;
+                    updateDisplay();
+                    offlineModal.classList.add('hidden');
+                    saveGame();
+                };
+
+                dontCollectOfflineButton.onclick = () => {
+                    offlineModal.classList.add('hidden');
+                    saveGame();
+                };
+            } else {
+                console.error("Offline modal elements not found.");
+            }
+        }
+
+        // Event Listener for the main meth button
+        if (methButton) {
+            methButton.addEventListener('click', clickMeth);
+        } else {
+            console.error("Meth button not found. Click functionality will not work.");
+        }
+
+        // Event Listener for the new toggle upgrades button
+        if (toggleUpgradesButton) {
+            toggleUpgradesButton.addEventListener('click', toggleUpgradesVisibility);
+        } else {
+            console.error("Toggle Upgrades button not found. Toggle functionality will not work.");
+        }
+
+        // Event Listener for the criminal charge button
+
+let walterAudio = document.getElementById('walterAudio');
+walterAudio.src = 'assets/Walta.mp3';
+
+        if (chargeButton) {
+    chargeButton.addEventListener('click', function() {
+        criminalCharge();
+        if (walterAudio) {
+            walterAudio.currentTime = 0;
+            walterAudio.play();
+        }
+    });
+        } else {
+            console.error("Criminal Charge button not found. Functionality will not work.");
+        }
+
+
+        // Initialize the game when the window loads
+        window.onload = function() {
+            try {
+                loadGame();
+                initializeUpgrades();
+                updateDisplay();
+                setInterval(gameLoop, 1000);
+                setInterval(saveGame, 5000);
+            } catch (error) {
+                console.error("An error occurred during game initialization:", error);
+            }
+        };
+
+        // Save game when the user leaves or closes the page
+        window.onbeforeunload = saveGame;
+    </script>
+</body>
+</html>
