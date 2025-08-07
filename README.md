@@ -1,29 +1,47 @@
-# Walter White Clicker
+### Walter White Clicker
+
+A simple browser game about producing meth and managing a criminal empire.
+
 ---
+
 ## How to Play
 
-The game is simple and addictive:
-
-* **Click for Meth!**: Click the big blue button to manually produce meth. The amount you get per click is your **MPC (Meth Per Click)**.
-* **Buy Upgrades**: Use your meth to buy upgrades from the "Upgrades" section. These upgrades can increase your MPC or your **MPS (Meth Per Second)**, which automatically generates meth for you even when you're not clicking.
-* **Commit Crime!**: This is the "rebirth" mechanic. When you have enough meth, you can commit a crime to reset your game progress (meth, upgrades, MPC, and MPS). In return, you'll gain a **Criminal Charge**. Criminal Charges unlock powerful, permanent upgrades that will help you progress faster in your next playthrough.
-* **Offline Production**: Your labs will continue to produce meth while you're away! When you return to the game, a modal will pop up, offering you the meth you earned offline.
+* **Click for Meth!**: Click the main button to produce meth. Your **MPC (Meth Per Click)** determines the amount you get.
+* **Buy Upgrades**: Use meth to increase your MPC or your **MPS (Meth Per Second)**, which generates meth automatically.
+* **Commit Crimes**: This "rebirth" mechanic resets your game but grants a **Criminal Charge**. These charges better upgrades.
+* **Offline Production**: The game continues to produce meth while you're away. A pop-up will offer you your earnings when you return.
 
 ---
 
 ## Features
 
-* **Responsive Design**: The game is built with Tailwind CSS, ensuring a clean and responsive interface on both desktop and mobile devices.
-* **Idle Gameplay**: The game features an MPS system, allowing you to earn meth passively.
-* **Rebirth System**: The "Commit Crime" mechanic provides a layer of strategic depth, encouraging you to reach certain goals to unlock permanent bonuses.
-* **Persistent Save**: Your game progress is automatically saved to your browser's local storage every 5 seconds and when you close the tab, so you can pick up where you left off.
-* **Background Music**: A looping background track enhances the immersive experience, with a volume slider for user control.
+* **Responsive Design**: Built with Tailwind CSS for a clean interface on any device.
+* **Idle Gameplay**: Earn meth passively with the MPS system.
+* **Rebirth System**: A strategic mechanic to unlock permanent bonuses.
+* **Persistent Save**: Your progress automatically saves to your browser's local storage.
+* **Background Music**: An optional looping track enhances the game's atmosphere.
 
 ---
 
-### Chrome DevTools Commands
+## Getting Started
 
-For developers and power users, you can use the browser's console to manually adjust your game stats.
+1.  Clone or download this repository.
+2.  Open `meth.html` in your web browser. No server is required.
+
+---
+
+## Technologies
+
+| Technology | Description |
+| :--- | :--- |
+| **HTML5, CSS3, & JavaScript (ES6+)** | The core technologies for the game's structure, styling, and logic. |
+| **Tailwind CSS** | A utility-first framework for UI development. |
+
+---
+
+## Additional Details
+
+### DevTools Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -31,20 +49,7 @@ For developers and power users, you can use the browser's console to manually ad
 | `mpc = amount` | Sets your Meth Per Click to a specific amount. |
 | `mps = amount` | Sets your Meth Per Second to a specific amount. |
 
----
-
-## Technologies Used
-
-| Technology | Description |
-| :--- | :--- |
-| **HTML5** | For the basic structure of the game. |
-| **CSS3** | Custom styles for modal windows and hover effects. |
-| **Tailwind CSS** | A utility-first CSS framework for rapid UI development. |
-| **JavaScript (ES6+)** | Powers all the game logic, including the clicker, upgrades, save/load functionality, and the rebirth system. |
-
----
-
-## Assets
+### Game Assets
 
 | Asset Type | File Path | Description |
 | :--- | :--- | :--- |
@@ -54,16 +59,8 @@ For developers and power users, you can use the browser's console to manually ad
 
 ---
 
-## How to Run
-
-1.  Clone or download this repository.
-2.  Ensure you have the `assets` folder with `bg-Music.ogg` and `Walta.mp3` in the same directory as `meth.html`.
-3.  Open the `meth.html` file in your preferred web browser.
-
-No server is required to run this game, as all the code is client-side.
-
----
-
 ## Preview
 
 ![example.png](https://raw.githubusercontent.com/ackozu/meth-clicker/refs/heads/main/example.png)
+
+###### **This application was made with Google Gemini and GitHub Copilot.**
