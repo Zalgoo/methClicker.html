@@ -1,9 +1,5 @@
 # Walter White Clicker
-
-Welcome to the **Walter White Clicker**! This is an incremental idle game where you, as Walter White, produce "meth" (in-game currency) to buy upgrades and expand your criminal empire. Click the button to produce meth, purchase upgrades to increase your production, and "commit crime" to gain permanent boosts.
-
 ---
-
 ## How to Play
 
 The game is simple and addictive:
@@ -29,31 +25,31 @@ The game is simple and addictive:
 
 For developers and power users, you can use the browser's console to manually adjust your game stats.
 
-| Command         | Description                                     |
-| :-------------- | :---------------------------------------------- |
+| Command | Description |
+| :--- | :--- |
 | `meth = amount` | Sets your current meth count to a specific amount. |
-| `mpc = amount`  | Sets your Meth Per Click to a specific amount.  |
-| `mps = amount`  | Sets your Meth Per Second to a specific amount. |
+| `mpc = amount` | Sets your Meth Per Click to a specific amount. |
+| `mps = amount` | Sets your Meth Per Second to a specific amount. |
 
 ---
 
 ## Technologies Used
 
-| Technology              | Description                                                                                             |
-| :---------------------- | :------------------------------------------------------------------------------------------------------ |
-| **HTML5** | For the basic structure of the game.                                                                    |
-| **CSS3** | Custom styles for modal windows and hover effects.                                                      |
-| **Tailwind CSS** | A utility-first CSS framework for rapid UI development.                                                 |
+| Technology | Description |
+| :--- | :--- |
+| **HTML5** | For the basic structure of the game. |
+| **CSS3** | Custom styles for modal windows and hover effects. |
+| **Tailwind CSS** | A utility-first CSS framework for rapid UI development. |
 | **JavaScript (ES6+)** | Powers all the game logic, including the clicker, upgrades, save/load functionality, and the rebirth system. |
 
 ---
 
 ## Assets
 
-| Asset Type         | File Path                 | Description                                    |
-| :----------------- | :------------------------ | :--------------------------------------------- |
-| **Background Music** | `assets/bg-Music.ogg`     | A looping audio track for the game's background. |
-| **Sound Effect** | `assets/Walta.mp3`        | A sound effect for in-game actions.             |
+| Asset Type | File Path | Description |
+| :--- | :--- | :--- |
+| **Background Music** | `assets/bg-Music.ogg` | A looping audio track for the game's background. |
+| **Sound Effect** | `assets/Walta.mp3` | A sound effect for in-game actions. |
 | **Image** | `https://static1.srcdn.com/wordpress/wp-content/uploads/2020/02/Breaking-Bad-things-Walter-White-feature.jpg` | A public-domain image of Walter White used in the game. |
 
 ---
@@ -66,5 +62,8 @@ For developers and power users, you can use the browser's console to manually ad
 
 No server is required to run this game, as all the code is client-side.
 
-## Preview:
+---
+
+## Preview
+
 ![example.png](https://raw.githubusercontent.com/ackozu/meth-clicker/refs/heads/main/example.png)
