@@ -1,7 +1,7 @@
 # meth-clicker
 A simple HTML clicker game.
 
-## How To Use
+## How To Play
 
 - Download The Code
     - Press the `"Code"` button and press `"Download .Zip"`
