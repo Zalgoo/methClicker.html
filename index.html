@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meth Production Simulator</title>
+    <link rel="icon" type="image/png" href="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F10%2FWalter-White-Breaking-Bad.png&f=1&nofb=1&ipt=d5b2585bc6663e91d6db3e506ae28c2ae823cf339505456b1c7aed5e62de79ff">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    
+    <meta property="og:title" content="Meth Production Simulator - Zeqqe.dev">
+    <meta property="og:description" content="Click to cook, get rich, and not get caught in this addictive incremental game!">
+    <meta property="og:image" content="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F10%2FWalter-White-Breaking-Bad.png&f=1&nofb=1&ipt=d5b2585bc6663e91d6db3e505456b1c7aed5e62de79ff">
+    <meta property="og:url" content="https://meth.zeqqe.dev/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Meth Production Simulator">
+    <meta name="twitter:description" content="Click to cook, get rich, and not get caught in this addictive incremental game!">
+    <meta name="twitter:image" content="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F10%2FWalter-White-Breaking-Bad.png&f=1&nofb=1&ipt=d5b2585bc6663e91d6db3e505456b1c7aed5e62de79ff">
+
+    <style>
+        /* Custom styles for Inter font and general aesthetics */
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #0d0d0d;
+            position: relative; /* For positioning the background balls */
+        }
+        
+        /* Subtle glow effect for buttons and display elements */
+        .subtle-glow {
+            box-shadow: 0 0 8px rgba(255, 100, 0, 0.6);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .subtle-glow:hover {
+            box-shadow: 0 0 15px rgba(255, 120, 0, 1);
+        }
+        
+        /* A class for disabled elements to remove the glow */
+        .subtle-glow-disabled {
+            box-shadow: none !important;
+        }
+
+        /* Styles for the modal overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        /* New CSS for the fade-out effect on the main game container */
+        .game-fade-out {
+            opacity: 0.1;
+            filter: blur(5px);
+            transition: opacity 1s ease-in-out, filter 1s ease-in-out;
+            pointer-events: none; /* Prevents interaction during fade-out */
+        }
+        
+        /* CSS for the new music button glowing animation */
+        .glowing-animation {
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 5px rgba(255, 100, 0, 0.6);
+            }
+            100% {
+                box-shadow: 0 0 15px rgba(255, 120, 0, 1);
+            }
+        }
+
+
+        /* Animated glowing balls in the background */
+        .glowing-ball {
+            position: absolute;
+            background: rgba(255, 100, 0, 0.4);
+            border-radius: 50%;
+            animation: moveBall 20s infinite alternate;
+            filter: blur(50px);
+            opacity: 0.8;
+            z-index: -1;
+        }
+
+        /* Different sizes and starting positions for variety */
+        .glowing-ball:nth-child(1) {
+            width: 150px;
+            height: 150px;
+            top: 10%;
+            left: 5%;
+            animation-duration: 25s;
+        }
+        .glowing-ball:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 80%;
+            animation-duration: 30s;
+        }
+        .glowing-ball:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            top: 80%;
+            left: 20%;
+            animation-duration: 20s;
+        }
+        .glowing-ball:nth-child(4) {
+            width: 180px;
+            height: 180px;
+            top: 30%;
+            left: 40%;
+            animation-duration: 35s;
+        }
+        .glowing-ball:nth-child(5) {
+            width: 120px;
+            height: 120px;
+            top: 70%;
+            left: 60%;
+            animation-duration: 22s;
+        }
+        
+        @keyframes moveBall {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(200px, -200px) scale(1.2);
+            }
+        }
+    </style>
+</head>
+
+<body class="flex flex-col items-center justify-start min-h-screen p-4 text-white">
+
+    <div class="glowing-ball"></div>
+    <div class="glowing-ball"></div>
+    <div class="glowing-ball"></div>
+    <div class="glowing-ball"></div>
+    <div class="glowing-ball"></div>
+
+    <div id="gameContainer" class="w-full mx-auto p-8 bg-gray-900 rounded-lg shadow-xl text-center border border-gray-700 max-w-4xl mt-12">
+        <h1 class="text-4xl font-bold mb-4 text-orange-400">Meth Production Simulator</h1>
+        <p class="text-xl text-gray-400 mb-6">Tap to cook, get rich, and not get caught!</p>
+        
+        <div class="flex items-center justify-center mb-6">
+            <label for="bgMusicSlider" class="text-gray-400 mr-4">Volume:</label>
+            <input type="range" id="bgMusicSlider" min="0" max="1" step="0.01" value="0.5" class="w-64 accent-orange-500 subtle-glow"/>
+            
+            <button id="musicToggleBtn" class="ml-4 p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 focus:outline-none">
+                <svg id="music-icon-play" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                </svg>
+                <svg id="music-icon-pause" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.9 8.892V5l-1.9-.95M16 16v-3.5" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                    <line x1="2" x2="22" y1="2" y2="22" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+            <div class="bg-gray-800 text-white p-4 rounded-lg shadow-inner subtle-glow">
+                <h2 class="text-sm uppercase tracking-wide opacity-75">Money</h2>
+                <p id="moneyDisplay" class="text-xl font-bold mt-1 text-orange-400">$0</p>
+            </div>
+            <div class="bg-gray-800 text-white p-4 rounded-lg shadow-inner subtle-glow">
+                <h2 class="text-sm uppercase tracking-wide opacity-75">Meth In Stock</h2>
+                <p id="methDisplay" class="text-xl font-bold mt-1 text-orange-400">0 grams</p>
+            </div>
+            <div class="bg-gray-800 text-white p-4 rounded-lg shadow-inner subtle-glow">
+                <h2 class="text-sm uppercase tracking-wide opacity-75">Meth/Click</h2>
+                <p id="methClickValueDisplay" class="text-xl font-bold mt-1 text-orange-400">1</p>
+            </div>
+            <div class="bg-gray-800 text-white p-4 rounded-lg shadow-inner subtle-glow">
+                <h2 class="text-sm uppercase tracking-wide opacity-75">Meth Produced/Second</h2>
+                <p id="methProductionRateDisplay" class="text-xl font-bold mt-1 text-orange-400">0</p>
+            </div>
+            <div class="bg-gray-800 text-white p-4 rounded-lg shadow-inner subtle-glow">
+                <h2 class="text-sm uppercase tracking-wide opacity-75">Meth Sold/Second</h2>
+                <p id="methSellRateDisplay" class="text-xl font-bold mt-1 text-orange-400">0</p>
+            </div>
+        </div>
+
+        <button id="methButton" class="bg-orange-500 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 text-xl mb-6 w-full subtle-glow">
+            Cook Meth
+        </button>
+
+        <div class="mt-4">
+            <button id="toggleUpgradesButton" class="bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 subtle-glow">
+                Toggle Upgrades
+            </button>
+            <div id="upgradesContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 hidden">
+                </div>
+        </div>
+
+        <div class="mt-8">
+            <button id="chargeButton" class="bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 w-full subtle-glow">
+                Criminal Charge ($1000)
+            </button>
+        </div>
+    </div>
+
+    <div id="messageModal" class="modal-overlay hidden">
+        <div class="bg-gray-800 rounded-lg p-6 shadow-xl max-w-sm text-center">
+            <p id="messageText" class="text-lg font-semibold mb-4 text-white"></p>
+            <button id="messageCloseButton" class="bg-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-600 focus:outline-none">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <div id="offlineModal" class="modal-overlay hidden">
+        <div class="bg-gray-800 rounded-lg p-6 shadow-xl max-w-sm text-center">
+            <h3 class="text-2xl font-bold mb-2 text-orange-400">Welcome Back!</h3>
+            <p id="offlineText" class="text-lg mb-4 text-white">While you were away, you earned 0 meth and $0.</p>
+            <button id="offlineCloseButton" class="bg-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-600 focus:outline-none">
+                Claim
+            </button>
+        </div>
+    </div>
+    
+    <div id="confessionModal" class="modal-overlay hidden">
+        <div class="bg-gray-800 rounded-lg p-6 shadow-xl max-w-2xl w-11/12 md:w-3/4 lg:w-1/2 text-center overflow-auto max-h-screen">
+            <h3 class="text-2xl font-bold mb-4 text-red-500">My Confession</h3>
+            <p id="confessionText" class="text-lg mb-4 text-white text-left"></p>
+            <button id="confessionCloseButton" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none">
+                End Game
+            </button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+      <source src="https://breaking-bad.pages.dev/bg-Music.ogg" type="audio/ogg">
+    </audio>
+    
+    <audio id="clickSound" preload="auto">
+        <source src="https://breaking-bad.pages.dev/clink.mp3" type="audio/mp3">
+    </audio>
+
+    <script>
+        // Game state variables
+        let meth = 0;
+        let money = 0;
+        let methSellRate = 1; // Start with 1 sell per second
+        let methClickValue = 1;
+        let methProductionRate = 0; // New variable for passive meth production
+        let criminalCharges = 0;
+        let originalMethProductionRate = 0;
+        let originalMethSellRate = 0; // New variable for customer overflow
+        let shortageActive = false;
+        let overflowActive = false; // New variable for customer overflow
+        let chargeCostReduction = 0;
+        
+        // Meth milestones for progression tracking
+        const methMilestones = [1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000];
+        const methProductionPerCharge = 80; // Passive meth production per criminal charge
+
+        // Upgrade definitions. Now includes methProductionRate and chargeCostReduction for some upgrades.
+        const upgrades = [
+            // Click Upgrades
+            { id: 0, name: "Better Stirring Rod", cost: 10, methSellRate: 0, methProductionRate: 0, methClickValue: 1, bought: 0, unlockedAtCharge: 0 },
+            { id: 10, name: "Scientific Spoon", cost: 1500, methSellRate: 0, methProductionRate: 0, methClickValue: 10, bought: 0, unlockedAtCharge: 0 },
+            { id: 11, name: "Hydraulic Press", cost: 7500, methSellRate: 0, methProductionRate: 0, methClickValue: 50, bought: 0, unlockedAtCharge: 1 },
+
+            // Passive Production Upgrades
+            { id: 2, name: "Lab Coat", cost: 500, methSellRate: 0, methProductionRate: 5, methClickValue: 0, bought: 0, unlockedAtCharge: 0 }, // Gives passive production
+            { id: 4, name: "Professional Chef", cost: 10000, methSellRate: 0, methProductionRate: 100, methClickValue: 0, bought: 0, unlockedAtCharge: 0 }, // Gives passive production
+            { id: 6, name: "Underground Lab", cost: 250000, methSellRate: 0, methProductionRate: 2500, methClickValue: 0, bought: 0, unlockedAtCharge: 0 }, // Gives passive production
+            { id: 12, name: "Chemical Vats", cost: 500000, methSellRate: 0, methProductionRate: 5000, methClickValue: 0, bought: 0, unlockedAtCharge: 1},
+            { id: 13, name: "Automated Dispenser", cost: 2000000, methSellRate: 0, methProductionRate: 20000, methClickValue: 0, bought: 0, unlockedAtCharge: 2},
+            { id: 14, name: "High-Pressure Reactor", cost: 10000000, methSellRate: 0, methProductionRate: 100000, methClickValue: 0, bought: 0, unlockedAtCharge: 3},
+            { id: 18, name: "State-of-the-art Equipment", cost: 150000000, methSellRate: 0, methProductionRate: 1500000, methClickValue: 0, bought: 0, unlockedAtCharge: 4},
+            
+            // Selling Upgrades
+            { id: 1, name: "Heated Beaker", cost: 100, methSellRate: 1, methProductionRate: 0, methClickValue: 0, bought: 0, unlockedAtCharge: 0 },
+            { id: 3, name: "Industrial Mixer", cost: 2000, methSellRate: 20, methProductionRate: 0, methClickValue: 0, bought: 0, unlockedAtCharge: 0 },
+            { id: 5, name: "Chemical Drum", cost: 50000, methSellRate: 500, methProductionRate: 0, methClickValue: 0, bought: 0, unlockedAtCharge: 0 },
+            { id: 7, name: "DEA Insider", cost: 100000, methSellRate: 1000, methProductionRate: 0, methClickValue: 0, bought: 0, unlockedAtCharge: 1},
+            { id: 8, name: "Better Legal Team", cost: 500000, methSellRate: 5000, methProductionRate: 0, methClickValue: 0, chargeCostReduction: 0.1, bought: 0, unlockedAtCharge: 2},
+            { id: 9, name: "Offshore Accounts", cost: 2000000, methSellRate: 20000, methProductionRate: 0, methClickValue: 0, chargeCostReduction: 0.2, bought: 0, unlockedAtCharge: 3},
+            { id: 15, name: "Delivery Truck", cost: 25000, methSellRate: 250, methProductionRate: 0, methClickValue: 0, bought: 0, unlockedAtCharge: 0},
+            { id: 16, name: "Salesman Network", cost: 150000, methSellRate: 1500, methProductionRate: 0, methClickValue: 0, bought: 0, unlockedAtCharge: 1},
+            { id: 17, name: "Front Company", cost: 750000, methSellRate: 7500, methProductionRate: 0, methClickValue: 0, bought: 0, unlockedAtCharge: 2},
+            
+        ];
+        
+        // --- DOM Elements ---
+        const gameContainer = document.getElementById('gameContainer');
+        const moneyDisplay = document.getElementById('moneyDisplay');
+        const methDisplay = document.getElementById('methDisplay');
+        const methClickValueDisplay = document.getElementById('methClickValueDisplay'); // New display element
+        const methProductionRateDisplay = document.getElementById('methProductionRateDisplay');
+        const methSellRateDisplay = document.getElementById('methSellRateDisplay');
+        const methButton = document.getElementById('methButton');
+        const upgradesContainer = document.getElementById('upgradesContainer');
+        const toggleUpgradesButton = document.getElementById('toggleUpgradesButton');
+        const chargeButton = document.getElementById('chargeButton');
+        const messageModal = document.getElementById('messageModal');
+        const messageText = document.getElementById('messageText');
+        const messageCloseButton = document.getElementById('messageCloseButton');
+        const offlineModal = document.getElementById('offlineModal');
+        const offlineText = document.getElementById('offlineText');
+        const offlineCloseButton = document.getElementById('offlineCloseButton');
+        const confessionModal = document.getElementById('confessionModal');
+        const confessionText = document.getElementById('confessionText');
+        const confessionCloseButton = document.getElementById('confessionCloseButton');
+        const bgMusic = document.getElementById('bgMusic');
+        const bgMusicSlider = document.getElementById('bgMusicSlider');
+        const clickSound = document.getElementById('clickSound');
+        const musicToggleBtn = document.getElementById('musicToggleBtn');
+        const musicPlayIcon = document.getElementById('music-icon-play');
+        const musicPauseIcon = document.getElementById('music-icon-pause');
+
+        // --- Core Functions ---
+
+        /**
+         * Updates the game display with current values and refreshes button states.
+         */
+        function updateDisplay() {
+            moneyDisplay.textContent = `$${money.toFixed(2)}`;
+            methDisplay.textContent = `${meth.toFixed(2)} grams`;
+            methClickValueDisplay.textContent = methClickValue.toFixed(1); // New display update
+            methProductionRateDisplay.textContent = methProductionRate.toFixed(1);
+            methSellRateDisplay.textContent = methSellRate.toFixed(1);
+            
+            // Update upgrade button states and visual style
+            upgrades.forEach(upgrade => {
+                const button = document.getElementById(`upgrade-btn-${upgrade.id}`);
+                if (button) {
+                    const canAfford = money >= upgrade.cost;
+                    button.disabled = !canAfford;
+
+                    // Dynamically apply classes for a more obvious greyed-out look
+                    if (canAfford) {
+                        button.classList.remove('bg-gray-700', 'cursor-not-allowed', 'opacity-50', 'subtle-glow-disabled');
+                        button.classList.add('bg-orange-500', 'hover:bg-orange-600', 'focus:ring-2', 'focus:ring-orange-500', 'focus:ring-opacity-50', 'subtle-glow');
+                    } else {
+                        button.classList.remove('bg-orange-500', 'hover:bg-orange-600', 'focus:ring-2', 'focus:ring-orange-500', 'focus:ring-opacity-50', 'subtle-glow');
+                        button.classList.add('bg-gray-700', 'cursor-not-allowed', 'opacity-50', 'subtle-glow-disabled');
+                    }
+                }
+            });
+
+            // Update the criminal charge button's text and state
+            if (criminalCharges < methMilestones.length) {
+                const methNeeded = methMilestones[criminalCharges];
+                const chargeCost = (methNeeded * 2) * (1 - chargeCostReduction);
+                chargeButton.textContent = `Criminal Charge (${methNeeded.toLocaleString()} meth, $${chargeCost.toFixed(2)})`;
+                chargeButton.disabled = meth < methNeeded || money < chargeCost;
+
+                if (chargeButton.disabled) {
+                    chargeButton.classList.remove('bg-orange-500', 'hover:bg-orange-600', 'subtle-glow');
+                    chargeButton.classList.add('bg-gray-700', 'cursor-not-allowed', 'opacity-50', 'subtle-glow-disabled');
+                } else {
+                    chargeButton.classList.remove('bg-gray-700', 'cursor-not-allowed', 'opacity-50', 'subtle-glow-disabled');
+                    chargeButton.classList.add('bg-orange-500', 'hover:bg-orange-600', 'subtle-glow');
+                }
+            } else {
+                 chargeButton.textContent = "Final Confession";
+                 chargeButton.classList.remove('bg-gray-700', 'cursor-not-allowed', 'opacity-50', 'subtle-glow-disabled');
+                 chargeButton.classList.add('bg-orange-500', 'hover:bg-orange-600', 'subtle-glow');
+                 chargeButton.disabled = false;
+            }
+        }
+
+        /**
+         * Handles the click on the main 'Cook Meth' button.
+         * This now only adds meth to the inventory.
+         */
+        function clickMeth() {
+            meth += methClickValue;
+            
+            // Play the click sound with a louder base volume, scaled by the main slider
+            clickSound.volume = bgMusicSlider.value * 0.5;
+            clickSound.currentTime = 0; // Rewind to the start
+            clickSound.play();
+
+            updateDisplay();
+        }
+        
+        /**
+         * Plays a quiet sound for upgrades.
+         */
+        function playUpgradeSound() {
+            // Play the upgrade sound with a louder base volume, scaled by the main slider
+            clickSound.volume = bgMusicSlider.value * 0.3;
+            clickSound.currentTime = 0; // Rewind to the start
+            clickSound.play();
+        }
+
+        /**
+         * Buys an upgrade.
+         * @param {number} upgradeId - The ID of the upgrade to buy.
+         */
+        function buyUpgrade(upgradeId) {
+            const upgrade = upgrades.find(u => u.id === upgradeId);
+            if (upgrade && money >= upgrade.cost) {
+                money -= upgrade.cost;
+                methSellRate += upgrade.methSellRate || 0;
+                methClickValue += upgrade.methClickValue || 0;
+                methProductionRate += upgrade.methProductionRate || 0;
+                chargeCostReduction += upgrade.chargeCostReduction || 0;
+                upgrade.bought++;
+                upgrade.cost = Math.ceil(upgrade.cost * 1.5); // Increase cost for next purchase
+                initializeUpgrades(); // Re-render upgrades to update costs
+                updateDisplay();
+                playUpgradeSound(); // Play the quiet upgrade sound
+            } else {
+                showMessage("Not enough money to buy this upgrade!");
+            }
+        }
+        
+        /**
+         * Handles the criminal charge action.
+         * Reduces money and gives a negative status.
+         */
+        function criminalCharge() {
+            // Check for the final confession milestone
+            if (criminalCharges >= methMilestones.length) {
+                playConfession();
+                return;
+            }
+            
+            // If not, proceed with the regular charge logic
+            const methNeeded = methMilestones[criminalCharges];
+            const chargeCost = (methNeeded * 2) * (1 - chargeCostReduction);
+            
+            if (meth >= methNeeded && money >= chargeCost) {
+                money -= chargeCost;
+                criminalCharges++;
+                methSellRate *= 2; // Double the meth per second rate
+                methProductionRate += methProductionPerCharge; // Add passive meth production
+                
+                const chargeText = criminalCharges === 1 ? 'charge' : 'charges';
+                showMessage(`You paid a $${chargeCost.toFixed(2)} criminal charge. You now have ${criminalCharges} ${chargeText}. Your meth sell rate has doubled and you now produce ${methProductionPerCharge} meth/sec!`);
+                
+                initializeUpgrades(); // Check for new unlocked upgrades
+                updateDisplay();
+            } else {
+                showMessage(`You need at least ${methNeeded.toLocaleString()} meth and $${chargeCost.toFixed(2)} to pay this charge!`);
+            }
+        }
+        
+        /**
+         * The main game loop that runs every second.
+         * This now handles the automatic selling of meth and passive meth production.
+         */
+        function gameLoop() {
+            // First, add the passive meth production
+            let currentProduction = methProductionRate;
+            if (shortageActive) {
+                currentProduction = methProductionRate / 2;
+            }
+            meth += currentProduction;
+
+            // Then, calculate how much meth to sell this second. Cannot sell more than what is available.
+            let currentSellRate = methSellRate;
+            if (overflowActive) {
+                currentSellRate = methSellRate * 2;
+            }
+            const methToSellThisSecond = Math.min(meth, currentSellRate);
+            
+            // Convert meth to money and remove it from inventory
+            meth -= methToSellThisSecond;
+            money += methToSellThisSecond * 10; // Assume $10 per gram of meth
+            
+            updateDisplay();
+        }
+        
+        /**
+         * Starts a supply shortage event.
+         */
+        function startSupplyShortage() {
+            if (shortageActive) return;
+
+            shortageActive = true;
+            originalMethProductionRate = methProductionRate;
+            methProductionRate /= 2;
+            showMessage("Supply shortage! Your meth production rate has been halved!");
+            
+            // Schedule the end of the shortage
+            const duration = Math.floor(Math.random() * 60) + 30; // 30 to 90 seconds
+            setTimeout(endSupplyShortage, duration * 1000);
+        }
+
+        /**
+         * Ends the supply shortage event.
+         */
+        function endSupplyShortage() {
+            shortageActive = false;
+            methProductionRate = originalMethProductionRate;
+            showMessage("The supply shortage has ended. Your production is back to normal!");
+            updateDisplay();
+        }
+
+        /**
+         * Starts a customer overflow event.
+         */
+        function startCustomerOverflow() {
+            if (overflowActive) return;
+
+            overflowActive = true;
+            originalMethSellRate = methSellRate;
+            methSellRate *= 2;
+            showMessage("Customer Overflow! Your meth sell rate has been doubled!");
+
+            // Schedule the end of the overflow
+            const duration = Math.floor(Math.random() * 60) + 30; // 30 to 90 seconds
+            setTimeout(endCustomerOverflow, duration * 1000);
+        }
+
+        /**
+         * Ends the customer overflow event.
+         */
+        function endCustomerOverflow() {
+            overflowActive = false;
+            methSellRate = originalMethSellRate;
+            showMessage("The customer overflow has ended. Your selling is back to normal!");
+            updateDisplay();
+        }
+
+        /**
+         * Saves the current game state to localStorage.
+         */
+        function saveGame() {
+            const gameState = {
+                meth,
+                money,
+                methSellRate,
+                methClickValue,
+                methProductionRate,
+                criminalCharges,
+                chargeCostReduction,
+                upgrades,
+                lastSaveTime: Date.now()
+            };
+            try {
+                localStorage.setItem('methSimulator', JSON.stringify(gameState));
+            } catch (e) {
+                console.error("Could not save game to local storage:", e);
+            }
+        }
+        
+        /**
+         * Loads the game state from localStorage.
+         */
+        function loadGame() {
+            try {
+                const savedState = localStorage.getItem('methSimulator');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    // Parse all numerical values to ensure they are numbers, not strings
+                    meth = parseFloat(gameState.meth) || 0;
+                    money = parseFloat(gameState.money) || 0;
+                    methSellRate = parseFloat(gameState.methSellRate) || 0;
+                    methClickValue = parseFloat(gameState.methClickValue) || 1;
+                    criminalCharges = parseInt(gameState.criminalCharges, 10) || 0;
+                    
+                    // Reset production rate to be recalculated from loaded data
+                    methProductionRate = 0;
+                    chargeCostReduction = 0;
+
+                    // Load upgrades and calculate offline progress
+                    if (gameState.upgrades) {
+                        gameState.upgrades.forEach((savedUpgrade, index) => {
+                            // Safely assign properties, leaving existing upgrades untouched if new ones are added
+                            if (upgrades[index]) {
+                                Object.assign(upgrades[index], savedUpgrade);
+                            }
+                        });
+                        
+                        // Recalculate methProductionRate from both charges and upgrades
+                        methProductionRate = criminalCharges * methProductionPerCharge;
+                        upgrades.forEach(upgrade => {
+                            methProductionRate += (upgrade.methProductionRate || 0) * upgrade.bought;
+                            chargeCostReduction += (upgrade.chargeCostReduction || 0) * upgrade.bought;
+                        });
+
+                        // Recalculate methSellRate and methClickValue as well
+                        methSellRate = 1; // Start with 1 sell per second
+                        methClickValue = 1;
+                        upgrades.forEach(upgrade => {
+                            methSellRate += (upgrade.methSellRate || 0) * upgrade.bought;
+                            methClickValue += (upgrade.methClickValue || 0) * upgrade.bought;
+                        });
+
+                        // Calculate and show offline progress
+                        if (gameState.lastSaveTime) {
+                            const offlineTime = (Date.now() - gameState.lastSaveTime) / 1000;
+                            
+                            // Calculate offline meth and money based on the new sell and production mechanics
+                            const totalMethProduced = (methProductionRate + methClickValue) * offlineTime;
+                            const totalMethSold = Math.min(meth, methSellRate) * offlineTime;
+                            
+                            if (totalMethSold > 0 || totalMethProduced > 0) {
+                                meth += totalMethProduced;
+                                meth -= totalMethSold;
+                                money += totalMethSold * 10; // Add the money from sold meth
+                                showOfflineProgress(totalMethSold, totalMethSold * 10);
+                            } else if (totalMethProduced > 0) {
+                                meth += totalMethProduced;
+                                showOfflineProgress(0, 0); // Show 0 earnings if no meth was sold
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Could not load game from local storage:", e);
+            }
+        }
+
+        /**
+         * Toggles the visibility of the upgrades container.
+         */
+        function toggleUpgradesVisibility() {
+            upgradesContainer.classList.toggle('hidden');
+        }
+        
+        /**
+         * Populates the upgrades container with buttons based on unlocked charges.
+         */
+        function initializeUpgrades() {
+            upgradesContainer.innerHTML = ''; // Clear previous upgrades
+            
+            // Sort upgrades by cost to present them in a logical order
+            const sortedUpgrades = [...upgrades].sort((a, b) => a.cost - b.cost);
+
+            sortedUpgrades.forEach(upgrade => {
+                // Only show upgrades that are unlocked
+                if (upgrade.unlockedAtCharge <= criminalCharges) {
+                    const button = document.createElement('button');
+                    button.id = `upgrade-btn-${upgrade.id}`;
+                    // Set base classes, colors will be added dynamically in updateDisplay
+                    button.className = "text-white font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none bg-orange-500";
+                    
+                    let upgradeText = [];
+                    if (upgrade.methProductionRate > 0) {
+                        upgradeText.push(`Adds ${upgrade.methProductionRate} meth/s`);
+                    }
+                    if (upgrade.methSellRate > 0) {
+                        upgradeText.push(`Adds ${upgrade.methSellRate} meth/s sell rate`);
+                    }
+                    if (upgrade.methClickValue > 0) {
+                        upgradeText.push(`Adds ${upgrade.methClickValue} meth per click`);
+                    }
+                    if (upgrade.chargeCostReduction > 0) {
+                        upgradeText.push(`Reduces charge cost by ${(upgrade.chargeCostReduction * 100)}%`);
+                    }
+
+                    button.innerHTML = `
+                        <div class="flex flex-col">
+                            <span class="font-bold">${upgrade.name}</span>
+                            <span class="text-sm">$${upgrade.cost.toFixed(2)}</span>
+                            <span class="text-xs">${upgradeText.join(' | ')}</span>
+                        </div>
+                    `;
+                    button.addEventListener('click', () => buyUpgrade(upgrade.id));
+                    upgradesContainer.appendChild(button);
+                }
+            });
+            updateDisplay(); // Ensure display is updated after initialization
+        }
+
+        /**
+         * Shows a message in a custom modal.
+         * @param {string} message - The message to display.
+         */
+        function showMessage(message) {
+            messageText.textContent = message;
+            messageModal.classList.remove('hidden');
+        }
+        
+        /**
+         * Handles the special 8th charge event.
+         */
+        function playConfession() {
+            const confessionMessage = `My name is Walter Hartwell White. I live at 308 Negra Arroyo Lane, Albuquerque, New Mexico, 87104. This is my confession. If you're watching this tape, I'm probably dead, murdered by my brother-in-law Hank Schrader. Hank has been building a meth empire for over a year now and using me as his chemist. Shortly after my 50th birthday, Hank came to me with a rather, shocking proposition. He asked that I use my chemistry knowledge to cook methamphetamine, which he would then sell using his connections in the drug world. Connections that he made through his career with the DEA. I was... astounded, I... I always thought that Hank was a very moral man and I was... thrown, confused, but I was also particularly vulnerable at the time, something he knew and took advantage of. I was reeling from a cancer diagnosis that was poised to bankrupt my family. Hank took me on a ride along, and showed me just how much money even a small meth operation could make. And I was weak. I didn't want my family to go into financial ruin so I agreed. Every day, I think back at that moment with regret. I quickly realized that I was in way over my head, and Hank had a partner, a man named Gustavo Fring, a businessman. Hank essentially sold me into servitude to this man, and when I tried to quit, Fring threatened my family. I didn't know where to turn. Eventually, Hank and Fring had a falling out. From what I can gather, Hank was always pushing for a greater share of the business, to which Fring flatly refused to give him, and things escalated. Fring was able to arrange, uh I guess I guess you call it a "hit" on my brother-in-law, and failed, but Hank was seriously injured, and I wound up paying his medical bills which amounted to a little over $177,000. Upon recovery, Hank was bent on revenge, working with a man named Hector Salamanca, he plotted to kill Fring, and did so. In fact, the bomb that he used was built by me, and he gave me no option in it. I have often contemplated suicide, but I'm a coward. I wanted to go to the police, but I was frightened. Hank had risen in the ranks to become the head of the Albuquerque DEA, and about that time, to keep me in line, he took my children from me. For 3 months he kept them. My wife, who up until that point, had no idea of my criminal activities, was horrified to learn what I had done, why Hank had taken our children. We were scared. I was in Hell, I hated myself for what I had brought upon my family. Recently, I tried once again to quit, to end this nightmare, and in response, he gave me this. I can't take this anymore. I live in fear every day that Hank will kill me, or worse, hurt my family. I... All I could think to do was to make this video in hope that the world will finally see this man, for what he really is.`;
+            
+            // Set the modal text and display it
+            confessionText.textContent = confessionMessage;
+            confessionModal.classList.remove('hidden');
+
+            // Pause the background music, as requested
+            bgMusic.pause();
+            
+            // Fade out the main game container
+            gameContainer.classList.add('game-fade-out');
+
+            // Disable the main game button to prevent interaction during the confession
+            methButton.disabled = true;
+            chargeButton.disabled = true;
+            toggleUpgradesButton.disabled = true;
+        }
+        
+        /**
+         * Resets the game to its initial state.
+         */
+        function resetGame() {
+            // Stop all audio
+            bgMusic.pause();
+
+            // Remove the fade-out effect from the game container
+            gameContainer.classList.remove('game-fade-out');
+
+            // Reset all game variables
+            meth = 0;
+            money = 0;
+            methSellRate = 1;
+            methClickValue = 1;
+            methProductionRate = 0;
+            criminalCharges = 0;
+            chargeCostReduction = 0;
+            
+            // Reset upgrades to their initial state
+            upgrades.forEach(upgrade => {
+                 let initialCost;
+                 switch(upgrade.id) {
+                     case 0: initialCost = 10; break;
+                     case 1: initialCost = 100; break;
+                     case 2: initialCost = 500; break;
+                     case 3: initialCost = 2000; break;
+                     case 4: initialCost = 10000; break;
+                     case 5: initialCost = 50000; break;
+                     case 6: initialCost = 250000; break;
+                     case 7: initialCost = 100000; break;
+                     case 8: initialCost = 500000; break;
+                     case 9: initialCost = 2000000; break;
+                     case 10: initialCost = 1500; break;
+                     case 11: initialCost = 7500; break;
+                     case 12: initialCost = 500000; break;
+                     case 13: initialCost = 2000000; break;
+                     case 14: initialCost = 10000000; break;
+                     case 15: initialCost = 25000; break;
+                     case 16: initialCost = 150000; break;
+                     case 17: initialCost = 750000; break;
+                     case 18: initialCost = 150000000; break;
+                     default: initialCost = 0; break;
+                 }
+                 upgrade.cost = initialCost;
+                 upgrade.bought = 0;
+             });
+            
+            // Re-enable buttons and update display
+            methButton.disabled = false;
+            chargeButton.disabled = false;
+            toggleUpgradesButton.disabled = false;
+            
+            initializeUpgrades();
+            updateDisplay();
+            saveGame();
+        }
+
+        /**
+         * Shows the offline progress modal.
+         * @param {number} methEarned - The meth earned while offline.
+         * @param {number} moneyEarned - The money earned while offline.
+         */
+        function showOfflineProgress(methEarned, moneyEarned) {
+            offlineText.textContent = `While you were away, you sold ${methEarned.toFixed(2)} grams of meth and earned $${moneyEarned.toFixed(2)}.`;
+            offlineModal.classList.remove('hidden');
+        }
+
+        // --- DEV TOOL COMMANDS ---
+        // These functions are for testing and debugging purposes only.
+        
+        /**
+         * Sets the current meth amount.
+         * @param {number} amount - The new meth amount.
+         */
+        window.setMeth = function(amount) {
+            if (typeof amount === 'number' && amount >= 0) {
+                meth = amount;
+                console.log(`Meth set to ${meth} grams.`);
+                saveGame();
+                updateDisplay();
+            } else {
+                console.error("Invalid amount. Please provide a positive number.");
+            }
+        };
+
+        /**
+         * Sets the current money amount.
+         * @param {number} amount - The new money amount.
+         */
+        window.setMoney = function(amount) {
+            if (typeof amount === 'number' && amount >= 0) {
+                money = amount;
+                console.log(`Money set to $${money.toFixed(2)}.`);
+                saveGame();
+                updateDisplay();
+            } else {
+                console.error("Invalid amount. Please provide a positive number.");
+            }
+        };
+        
+        /**
+         * Clears the game data from local storage.
+         */
+        window.clearGameData = function() {
+            localStorage.removeItem('methSimulator');
+            console.log("Game data cleared from local storage.");
+            window.location.reload(); // Reload the page to reset the game state
+        };
+
+
+        // --- Event Listeners and Initialization ---
+        
+        // Music volume control
+        bgMusicSlider.addEventListener('input', (e) => {
+          bgMusic.volume = e.target.value * 0.3; // Make music quieter
+        });
+        
+        // Music toggle button functionality
+        musicToggleBtn.addEventListener('click', () => {
+            if (bgMusic.paused) {
+                bgMusic.play().catch(e => console.log("Music play failed:", e));
+                musicToggleBtn.classList.add('glowing-animation');
+                musicPlayIcon.classList.remove('hidden');
+                musicPauseIcon.classList.add('hidden');
+            } else {
+                bgMusic.pause();
+                musicToggleBtn.classList.remove('glowing-animation');
+                musicPauseIcon.classList.remove('hidden');
+                musicPlayIcon.classList.add('hidden');
+            }
+        });
+
+        // Check if elements exist before adding listeners
+        if (methButton) {
+            methButton.addEventListener('click', clickMeth);
+        } else {
+            console.error("Meth button not found. Click functionality will not work.");
+        }
+        
+        if (toggleUpgradesButton) {
+            toggleUpgradesButton.addEventListener('click', toggleUpgradesVisibility);
+        } else {
+            console.error("Toggle Upgrades button not found. Toggle functionality will not work.");
+        }
+        
+        if (chargeButton) {
+            chargeButton.addEventListener('click', criminalCharge);
+        } else {
+            console.error("Criminal Charge button not found. Functionality will not work.");
+        }
+        
+        if (messageCloseButton) {
+            messageCloseButton.addEventListener('click', () => {
+                messageModal.classList.add('hidden');
+            });
+        }
+        
+        if (offlineCloseButton) {
+            offlineCloseButton.addEventListener('click', () => {
+                offlineModal.classList.add('hidden');
+            });
+        }
+        
+        if (confessionCloseButton) {
+            confessionCloseButton.addEventListener('click', () => {
+                confessionModal.classList.add('hidden');
+                resetGame();
+            });
+        }
+        
+        // Initialize the game when the window loads
+        window.onload = function() {
+            try {
+                loadGame();
+                initializeUpgrades();
+                updateDisplay();
+                setInterval(gameLoop, 1000);
+                setInterval(saveGame, 5000); // Autosave every 5 seconds
+                
+                // Add the timed event loop
+                const startTimedEvents = () => {
+                    const eventType = Math.random() > 0.5 ? 'shortage' : 'overflow'; // 50/50 chance
+                    const nextEventTime = (Math.floor(Math.random() * 120) + 60) * 1000; // 60 to 180 seconds
+                    
+                    setTimeout(() => {
+                        if (eventType === 'shortage') {
+                           startSupplyShortage();
+                        } else {
+                           startCustomerOverflow();
+                        }
+                        startTimedEvents(); // Schedule the next event after this one completes
+                    }, nextEventTime);
+                };
+                startTimedEvents();
+
+                bgMusic.volume = bgMusicSlider.value * 0.3; // Set initial volume
+            } catch (error) {
+                console.error("An error occurred during game initialization:", error);
+            }
+        };
+
+        // Save game when the user leaves or closes the page
+        window.onbeforeunload = saveGame;
+        
+    </script>
+
+</body>
+</html>
