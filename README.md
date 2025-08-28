@@ -31,7 +31,7 @@
 >     - Once in the folder, double-click on the .html file.
 
 ### Preview
-![Alt Text](https://raw.githubusercontent.com/Zeqqqe/meth-clicker/refs/heads/main/example.png)
+[![Alt Text](https://raw.githubusercontent.com/Zeqqqe/meth-clicker/refs/heads/main/example.png)](https://meth.zeqqe.dev)
 
 
 <details>
