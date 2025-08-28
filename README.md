@@ -32,7 +32,11 @@ A simple HTML clicker game.
 ### Preview
 ![Alt Text](https://raw.githubusercontent.com/Zeqqqe/meth-clicker/refs/heads/main/example.png)
 
+<details>
+  <summary>Misc Info</summary>
 
-###### **This application was made with Google Gemini and GitHub Copilot.**
+> ![Star History Chart](https://api.star-history.com/svg?repos=Zalgoo/methClicker.html&type=Date)
+> 
+> ###### **This application was made with Google Gemini and GitHub Copilot.**
 
 
